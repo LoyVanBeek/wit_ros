@@ -1,0 +1,5 @@
+<launch>
+  <node name="wit_node" pkg="wit_ros" type="wit_ros.py" output="screen" required="true">
+    <rosparam command="load" file="$(find wit_ros)/param/api.yaml" />
+  </node>
+</launch>

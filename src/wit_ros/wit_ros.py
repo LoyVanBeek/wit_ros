@@ -4,7 +4,8 @@
 import roslib
 roslib.load_manifest('wit_ros')
 
-APIKEY ='VJ52BYRJMSLYAAHPBTKZ2RW2CTE2B3DZ'
+global APIKEY
+APIKEY = None
 
 import rospy
 import requests
@@ -27,6 +28,13 @@ def interpret(rosrequest):
 if __name__ == "__main__":
     rospy.init_node("wit_ros")
 
-    rospy.Service('wit/interpret', Interpret, interpret)
+    if rospy.has_param('~api_key'):
+        APIKEY = rospy.get_param("~api_key")
 
-    rospy.spin()
+        rospy.Service('wit/interpret', Interpret, interpret)
+
+        rospy.spin()
+
+    else:
+        rospy.logerr("No API key set (via parameter server). Please set one. " +
+            "API keys can be obtained via the http://www.wit.ai")
