@@ -2,4 +2,4 @@ string sentence
 ---
 string msg_body
 string msg_id
-string outcome
+Outcome outcome
