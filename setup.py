@@ -9,7 +9,7 @@ setup(  name='wit_ros',
         scripts=['src/wit_ros/wit_ros.py'],
         url='http://github.com/yol/wit_ros',
         license='LICENSE.txt',
-        description='iROS wrapper around the Wit.ai NLP API',
+        description='ROS wrapper around the Wit.ai NLP API',
         long_description=open('README.md').read(),
         install_requires=["requests"]
 )
