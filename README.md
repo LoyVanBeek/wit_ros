@@ -14,10 +14,16 @@ Then, run
 
 	$ rosservice call /wit/interpret "Hi there!"
 
-msg_body: Hi there
-msg_id: 17783400-1075-44a4-a105-7f43754817e7
-outcome: 
-  confidence: 0.319000005722
-  intent: hello
-  entities: []
+This results in:
 
+	msg_body: Hi there
+	msg_id: 17783400-1075-44a4-a105-7f43754817e7
+	outcome: 
+  		confidence: 0.319000005722
+  		intent: hello
+  		entities: []
+
+
+TODO
+----
+- Catkinize this package. Iǘe never worked with catkin before, so I stuck with rosbuild for now. 
