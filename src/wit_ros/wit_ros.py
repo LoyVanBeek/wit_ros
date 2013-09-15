@@ -14,16 +14,18 @@ from wit_ros.srv import Interpret, InterpretResponse
 from wit_ros.msg import Outcome, Entity
 
 def interpret(rosrequest):
+    rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
     httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
     data = httpresponse.json()
-    
+    rospy.logdebug("Data: {0}".format(data))
+
     entities = []
     for name, json in data["outcome"]["entities"].iteritems():
         entity = Entity(name    = str(name),
                         body    = str(json["body"]),
-                        start   = str(json["start"]),
-                        end     = str(json["end"]),
+                        start   = int(json["start"]),
+                        end     = int(json["end"]),
                         value   = str(json["value"]))
         entities += [entity]
 
@@ -34,7 +36,6 @@ def interpret(rosrequest):
     response = InterpretResponse(   msg_body    = str(data["msg_body"]),
                                     msg_id      = str(data["msg_id"]),
                                     outcome     = outcome)
-    print response
     return response
 
 if __name__ == "__main__":
