@@ -4,3 +4,12 @@ build
 bin
 srv_gen
 msg_gen
+catkin 
+catkin_generated 
+CMakeFiles 
+CMakeCache.txt 
+cmake_install.cmake 
+test_results 
+gtest 
+devel 
+lib
