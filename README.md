@@ -23,3 +23,7 @@ This results in:
   		intent: hello
   		entities: []
 
+
+TODO
+----
+- Catkinize this package. Iǘe never worked with catkin before, so I stuck with rosbuild for now. 
