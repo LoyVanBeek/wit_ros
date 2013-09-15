@@ -1,3 +1,4 @@
+param/api.yaml
 *.pyc
 *.pyo
 build
