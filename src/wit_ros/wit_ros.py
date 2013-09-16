@@ -20,17 +20,21 @@ def interpret(rosrequest):
     data = httpresponse.json()
     rospy.logdebug("Data: {0}".format(data))
 
-    entities = []
-    for name, json in data["outcome"]["entities"].iteritems():
-        entity = Entity(name    = str(name),
-                        body    = str(json["body"]),
-                        start   = int(json["start"]),
-                        end     = int(json["end"]),
-                        value   = str(json["value"]))
-        entities += [entity]
+    all_entities = []
+    for name, entities in data["outcome"]["entities"].iteritems():
+        if not isinstance(entities, list):
+            entities = [entities]
 
-    outcome = Outcome(          confidence  = float(data["outcome"]["confidence"]), 
-                                entities    = entities,
+        entities = [Entity(name  = str(name),
+                           body  = str(e["body"]),
+                           start = int(e["start"]),
+                           end   = int(e["end"]),
+                           value = str(e["value"])) for e in entities]
+
+        all_entities += entities
+
+    outcome = Outcome(          confidence  = float(data["outcome"]["confidence"]),
+                                entities    = all_entities,
                                 intent      = str(data["outcome"]["intent"]))
 
     response = InterpretResponse(   msg_body    = str(data["msg_body"]),
