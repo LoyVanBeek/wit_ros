@@ -17,7 +17,11 @@ def interpret(rosrequest):
     rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
     httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
-    data = httpresponse.json()
+    if callable(httpresponse.json):
+        data = httpresponse.json()
+    else:
+        data = httpresponse.json
+        
     rospy.logdebug("Data: {0}".format(data))
 
     all_entities = []
