@@ -5,9 +5,10 @@ Wrapper for the wit.ai natural language API
 
 Installation
 ------------
-$ git clone https://github.com/yol/wit_ros.git
-$ cmake . #To create a Makefile. I could use some hints on this, I never made one myself.
-$ rosmake
+
+	$ git clone https://github.com/yol/wit_ros.git
+	$ cmake . #To create a Makefile. I could use some hints on this, I never made one myself.
+	$ rosmake
 
 Be sure to create a file api.yaml in a param directory, like this:
 
