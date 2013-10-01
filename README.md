@@ -7,7 +7,8 @@ Installation
 ------------
 
 	$ git clone https://github.com/yol/wit_ros.git
-	$ cmake . #To create a Makefile. I could use some hints on this, I never made one myself.
+	$ cd wit_ros
+	$ cmake .
 	$ rosmake
 
 Be sure to create a file api.yaml in a param directory, like this:
@@ -19,11 +20,11 @@ After rosmake-ing this package, you can run it with
 
 Then, run 
 
-	$ rosservice call /wit/interpret "Hi there!"
+	$ rosservice call /wit/interpret "hi there"
 
 This results in:
 
-	msg_body: Hi there
+	msg_body: hi there
 	msg_id: 17783400-1075-44a4-a105-7f43754817e7
 	outcome: 
   		confidence: 0.319000005722
@@ -33,4 +34,4 @@ This results in:
 
 TODO
 ----
-- Catkinize this package. Iǘe never worked with catkin before, so I stuck with rosbuild for now. 
+- Catkinize this package. I've never worked with catkin before, so I stuck with rosbuild for now. 
