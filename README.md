@@ -3,9 +3,15 @@ wit_ros
 
 Wrapper for the wit.ai natural language API
 
+Installation
+------------
+$ git clone https://github.com/yol/wit_ros.git
+$ cmake . #To create a Makefile. I could use some hints on this, I never made one myself.
+$ rosmake
+
 Be sure to create a file api.yaml in a param directory, like this:
 
-  api_key: V.....Z
+  api_key: V.....Z #Get your API key/access token from https://console.wit.ai/#/settings
   
 After rosmake-ing this package, you can run it with 
   roslaunch wit_ros start.launch
