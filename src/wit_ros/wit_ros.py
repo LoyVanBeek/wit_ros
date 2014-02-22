@@ -17,6 +17,8 @@ def interpret(rosrequest):
     rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
     httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
+    rospy.logdebug(httpresponse)
+
     if callable(httpresponse.json):
         data = httpresponse.json()
     else:
@@ -24,21 +26,22 @@ def interpret(rosrequest):
         
     rospy.logdebug("Data: {0}".format(data))
 
-    all_entities = []
-    for name, entities in data["outcome"]["entities"].iteritems():
-        if not isinstance(entities, list):
-            entities = [entities]
+    ros_entities = []
 
-        entities = [Entity(name  = str(name),
-                           body  = str(e["body"]),
-                           start = int(e["start"]),
-                           end   = int(e["end"]),
-                           value = str(e["value"])) for e in entities]
-
-        all_entities += entities
+    for entity_name, entity_properties in data["outcome"]["entities"].iteritems():   
+        entity = Entity(name=str(entity_name))
+        if 'body' in entity_properties: 
+            entity.body = str(entity_properties["body"])
+        if 'start' in entity_properties: 
+            entity.start = int(entity_properties["start"]) 
+        if 'end' in entity_properties: 
+            entity.end = int(entity_properties["end"]) 
+        if 'value' in entity_properties: 
+            entity.value = str(entity_properties["value"])
+        ros_entities += [entity]
 
     outcome = Outcome(          confidence  = float(data["outcome"]["confidence"]),
-                                entities    = all_entities,
+                                entities    = ros_entities,
                                 intent      = str(data["outcome"]["intent"]))
 
     response = InterpretResponse(   msg_body    = str(data["msg_body"]),
