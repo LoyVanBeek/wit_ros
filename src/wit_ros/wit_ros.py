@@ -9,22 +9,20 @@ APIKEY = None
 
 import rospy
 import requests
+import json
 
-from wit_ros.srv import Interpret, InterpretResponse
+from sh import timeout, sox
+
+from wit_ros.srv import Interpret, InterpretResponse, ListenAndInterpret, ListenAndInterpretResponse
 from wit_ros.msg import Outcome, Entity
 
-def interpret(rosrequest):
-    rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
-    httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
-        headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
-    rospy.logdebug(httpresponse)
-
+def parse_response(httpresponse, klass):
     if callable(httpresponse.json):
         data = httpresponse.json()
     else:
         data = httpresponse.json
         
-    rospy.logdebug("Data: {0}".format(data))
+    rospy.logdebug("Data: {0}".format(json.dumps(data, indent=4, separators=(',', ': '))))
 
     ros_entities = []
 
@@ -44,18 +42,40 @@ def interpret(rosrequest):
                                 entities    = ros_entities,
                                 intent      = str(data["outcome"]["intent"]))
 
-    response = InterpretResponse(   msg_body    = str(data["msg_body"]),
+    response = klass(   msg_body    = str(data["msg_body"]),
                                     msg_id      = str(data["msg_id"]),
                                     outcome     = outcome)
     return response
 
+def interpret(rosrequest):
+    rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
+    httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
+        headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
+    rospy.logdebug(httpresponse)
+
+    return parse_response(httpresponse, InterpretResponse)
+
+def listen_and_interpret(rosrequest):
+    sox("-d","-b 16", "-c 1", "-r 16k", "/tmp/sample.wav") #Record an audio fragment
+    #import ipdb; ipdb.set_trace()
+    sample = open('/tmp/sample.wav', 'rb')
+
+    rospy.logdebug("Interpreting audio sample")
+    httpresponse = requests.post('https://api.wit.ai/speech', 
+        headers={"Authorization":"Bearer {key}".format(key=APIKEY),
+                 "Content-type":"audio/wav"}, data=sample)
+    rospy.logdebug(httpresponse)
+
+    return parse_response(httpresponse, ListenAndInterpretResponse)
+
 if __name__ == "__main__":
-    rospy.init_node("wit_ros")
+    rospy.init_node("wit_ros", log_level=rospy.DEBUG)
 
     if rospy.has_param('~api_key'):
         APIKEY = rospy.get_param("~api_key")
 
         rospy.Service('wit/interpret', Interpret, interpret)
+        rospy.Service('wit/listen_interpret', ListenAndInterpret, listen_and_interpret)
 
         rospy.spin()
 

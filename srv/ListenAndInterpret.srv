@@ -1,0 +1,4 @@
+---
+string msg_body
+string msg_id
+Outcome outcome
