@@ -6,14 +6,16 @@ Wrapper for the wit.ai natural language API
 Installation
 ------------
 
-	$ git clone https://github.com/yol/wit_ros.git
+	$ git clone https://github.com/LoyVanBeek/wit_ros.git
 	$ cd wit_ros
 	$ cmake .
 	$ rosmake
 
 Be sure to create a file api.yaml in a param directory, like this:
 
-  api_key: V.....Z #Get your API key/access token from https://console.wit.ai/#/settings
+        $ cd param
+        $ vim api.yaml #Use any editor to edit the API key
+          api_key: V.....Z #Get your API key/access token from https://console.wit.ai/#/settings
   
 After rosmake-ing this package, you can run it with 
   roslaunch wit_ros start.launch
