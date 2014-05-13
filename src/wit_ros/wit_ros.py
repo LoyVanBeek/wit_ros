@@ -65,7 +65,7 @@ def listen_and_interpret(rosrequest):
     sample = open('/tmp/sample.wav', 'rb')
 
     rospy.loginfo("Done, interpreting audio sample")
-    httpresponse = requests.post('https://api.wit.ai/speech', 
+    httpresponse = requests.post('https://api.wit.ai/speech?v=20140401', 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY),
                  "Content-type":"audio/wav"}, data=sample)
     rospy.logdebug(httpresponse)
