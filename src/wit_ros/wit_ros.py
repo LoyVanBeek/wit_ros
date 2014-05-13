@@ -52,7 +52,7 @@ def parse_response(httpresponse, klass):
 
 def interpret(rosrequest):
     rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
-    httpresponse = requests.get('http://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence), 
+    httpresponse = requests.get('https://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence), 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
     rospy.logdebug(httpresponse)
 
