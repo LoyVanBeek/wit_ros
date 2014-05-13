@@ -11,7 +11,10 @@ import rospy
 import requests
 import json
 
-from sh import rec
+try:
+    from sh import rec
+except ImportError:
+    print "Please install the 'rec' utility with 'sudo apt-get install sox' "
 
 from wit_ros.srv import Interpret, InterpretResponse, ListenAndInterpret, ListenAndInterpretResponse
 from wit_ros.msg import Outcome, Entity
@@ -49,7 +52,7 @@ def parse_response(httpresponse, klass):
 
 def interpret(rosrequest):
     rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
-    httpresponse = requests.get('https://api.wit.ai/message?q={sentence}'.format(sentence=rosrequest.sentence), 
+    httpresponse = requests.get('http://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence), 
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
     rospy.logdebug(httpresponse)
 
