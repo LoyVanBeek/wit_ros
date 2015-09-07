@@ -1,4 +1,4 @@
-### Work In Progress on this Fork:
+### Work in progress on this fork:
 - [x] Catkinized
 - [ ] Use wit.ai API
 
