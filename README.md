@@ -1,6 +1,7 @@
 ### Work in progress on this fork:
 - [x] Catkinized
-- [ ] Use wit.ai API
+- [x] Use wit.ai API
+- [x] Publish Outcome messages to /stt topic
 
 wit_ros
 =======
