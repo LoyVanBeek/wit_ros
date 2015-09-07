@@ -2,6 +2,7 @@
 - [x] Catkinized
 - [x] Use wit.ai API
 - [x] Publish Outcome messages to /stt topic
+- [ ] Subscribe to an audio stream topic and analyze 
 
 wit_ros
 =======
