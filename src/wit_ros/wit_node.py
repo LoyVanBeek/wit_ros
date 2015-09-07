@@ -1,81 +1,70 @@
 #!/usr/bin/env python
 """ROS node for the Wit.ai API"""
 
-import roslib
-roslib.load_manifest('wit_ros')
-
 global APIKEY
 APIKEY = None
 
 import rospy
 import requests
 import json
-try:
-    from sh import rec
-except ImportError:
-    rospy.logerr("Failed to find rec from sox package")
-    print "Please install the 'rec' utility with 'sudo apt-get install sox' "
+import wit
 
 from wit_ros.srv import Interpret, InterpretResponse, ListenAndInterpret, ListenAndInterpretResponse
 from wit_ros.msg import Outcome, Entity
 
-def parse_response(httpresponse, klass):
-    if callable(httpresponse.json):
-        data = httpresponse.json()
-    else:
-        data = httpresponse.json
-
-    rospy.logdebug("Data: {0}".format(json.dumps(data, indent=4, separators=(',', ': '))))
-
+def parse_response(response, klass):
+    rospy.logdebug("Data: {0}".format(json.dumps(response, indent=4, separators=(',', ': '))))
     ros_entities = []
 
-    for entity_name, entity_properties in data["outcome"]["entities"].iteritems():
+    entities = response["outcomes"][0]["entities"]
+
+    for entity_name, entity_properties in entities.iteritems():
+        entity_properties = entity_properties[0]
         entity = Entity(name=str(entity_name))
-        if 'body' in entity_properties:
-            entity.body = str(entity_properties["body"])
-        if 'start' in entity_properties:
-            entity.start = int(entity_properties["start"])
-        if 'end' in entity_properties:
-            entity.end = int(entity_properties["end"])
+        if 'type' in entity_properties:
+            entity.type = str(entity_properties["type"])
         if 'value' in entity_properties:
             entity.value = str(entity_properties["value"])
+        if 'unit' in entity_properties:
+            entity.unit = str(entity_properties["unit"])
+        if 'suggested' in entity_properties:
+            entity.suggested = str(entity_properties["suggested"])
         ros_entities += [entity]
 
-    outcome = Outcome(          confidence  = float(data["outcome"]["confidence"]),
+    outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
                                 entities    = ros_entities,
-                                intent      = str(data["outcome"]["intent"]))
+                                intent      = str(response["outcomes"][0]["intent"]))
 
-    response = klass(   msg_body    = str(data["msg_body"]),
-                                    msg_id      = str(data["msg_id"]),
+    response = klass(   msg_body    = str(response),
+                                    msg_id      = str(response["msg_id"]),
                                     outcome     = outcome)
     return response
 
 def interpret(rosrequest):
-    rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
-    httpresponse = requests.get('https://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence),
-        headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
-    rospy.logdebug(httpresponse)
+    sentence = rosrequest.sentence
+    rospy.logdebug("Interpreting {0}".format(sentence))
+    response = json.loads(wit.text_query(sentence, APIKEY))
+    rospy.logdebug("Response: {0}".format(response))
 
-    return parse_response(httpresponse, InterpretResponse)
+    return parse_response(response, InterpretResponse)
 
 def listen_and_interpret(rosrequest):
-    rospy.loginfo("Recording audio sample")
-    rec("/tmp/sample.wav", "silence", "-l", "1", "5", "20%", "1", "0:00:02", "15%") #Record an audio fragment
-    #import ipdb; ipdb.set_trace()
-    sample = open('/tmp/sample.wav', 'rb')
-
-    rospy.loginfo("Done, interpreting audio sample")
-    httpresponse = requests.post('https://api.wit.ai/speech?v=20140401',
-        headers={"Authorization":"Bearer {key}".format(key=APIKEY),
-                 "Content-type":"audio/wav"}, data=sample)
-    rospy.logdebug(httpresponse)
-    if httpresponse.status_code != 200:
+    rospy.logdebug("About to record audio")
+    response = json.loads(wit.voice_query_auto(APIKEY))
+    rospy.logdebug("Response: {0}".format(response))
+    if not response:
         return None
 
-    return parse_response(httpresponse, ListenAndInterpretResponse)
+    return parse_response(response, ListenAndInterpretResponse)
+
+def shutdown():
+  wit.close()
 
 if __name__ == "__main__":
     rospy.init_node("wit_ros", log_level=rospy.INFO)
+    rospy.on_shutdown(shutdown)
+
+    wit.init()
 
     if rospy.has_param('~api_key'):
         APIKEY = rospy.get_param("~api_key")
