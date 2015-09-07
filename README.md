@@ -1,5 +1,6 @@
 ### Work In Progress:
 [x] Catkinized
+
 [ ] Use wit.ai API
 
 wit_ros
