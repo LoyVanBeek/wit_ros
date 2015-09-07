@@ -38,6 +38,8 @@ def parse_response(response, klass):
     response = klass(   msg_body    = str(response),
                                     msg_id      = str(response["msg_id"]),
                                     outcome     = outcome)
+    pub.publish(outcome)
+
     return response
 
 def interpret(rosrequest):
@@ -63,6 +65,7 @@ def shutdown():
 if __name__ == "__main__":
     rospy.init_node("wit_ros", log_level=rospy.INFO)
     rospy.on_shutdown(shutdown)
+    pub = rospy.Publisher('stt', Outcome, queue_size=1)
 
     wit.init()
 
