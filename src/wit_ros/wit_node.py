@@ -10,10 +10,10 @@ APIKEY = None
 import rospy
 import requests
 import json
-
 try:
     from sh import rec
 except ImportError:
+    rospy.logerr("Failed to find rec from sox package")
     print "Please install the 'rec' utility with 'sudo apt-get install sox' "
 
 from wit_ros.srv import Interpret, InterpretResponse, ListenAndInterpret, ListenAndInterpretResponse
@@ -24,20 +24,20 @@ def parse_response(httpresponse, klass):
         data = httpresponse.json()
     else:
         data = httpresponse.json
-        
+
     rospy.logdebug("Data: {0}".format(json.dumps(data, indent=4, separators=(',', ': '))))
 
     ros_entities = []
 
-    for entity_name, entity_properties in data["outcome"]["entities"].iteritems():   
+    for entity_name, entity_properties in data["outcome"]["entities"].iteritems():
         entity = Entity(name=str(entity_name))
-        if 'body' in entity_properties: 
+        if 'body' in entity_properties:
             entity.body = str(entity_properties["body"])
-        if 'start' in entity_properties: 
-            entity.start = int(entity_properties["start"]) 
-        if 'end' in entity_properties: 
-            entity.end = int(entity_properties["end"]) 
-        if 'value' in entity_properties: 
+        if 'start' in entity_properties:
+            entity.start = int(entity_properties["start"])
+        if 'end' in entity_properties:
+            entity.end = int(entity_properties["end"])
+        if 'value' in entity_properties:
             entity.value = str(entity_properties["value"])
         ros_entities += [entity]
 
@@ -52,7 +52,7 @@ def parse_response(httpresponse, klass):
 
 def interpret(rosrequest):
     rospy.logdebug("Interpreting {0}".format(rosrequest.sentence))
-    httpresponse = requests.get('https://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence), 
+    httpresponse = requests.get('https://api.wit.ai/message?v=20140401&q={sentence}'.format(sentence=rosrequest.sentence),
         headers={"Authorization":"Bearer {key}".format(key=APIKEY)})
     rospy.logdebug(httpresponse)
 
@@ -65,7 +65,7 @@ def listen_and_interpret(rosrequest):
     sample = open('/tmp/sample.wav', 'rb')
 
     rospy.loginfo("Done, interpreting audio sample")
-    httpresponse = requests.post('https://api.wit.ai/speech?v=20140401', 
+    httpresponse = requests.post('https://api.wit.ai/speech?v=20140401',
         headers={"Authorization":"Bearer {key}".format(key=APIKEY),
                  "Content-type":"audio/wav"}, data=sample)
     rospy.logdebug(httpresponse)
