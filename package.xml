@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>wit_ros</name>
+  <version>0.1.0</version>
+  <description>
+    Wrapper for the wit.ai natural language API
+  </description>
+  <maintainer email="daniel.chalef@gmail.com">Daniel Chalef</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/danielchalef/wit_ros</url>
+  <author>Loy Van Beek</author>
+  <author>Daniel Chalef</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+
+  <build_depend>message_generation</build_depend>
+
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+</package>

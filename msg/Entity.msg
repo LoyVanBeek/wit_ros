@@ -2,9 +2,9 @@
 #     u'end': 15,
 #     u'start': 8,
 #     u'value': u'a drink'}}
-# 
+#
 string name
-string body
-uint32 start
-uint32 end
+string type
 string value
+string unit
+string suggested
