@@ -1,7 +1,4 @@
-### Work in progress on this fork:
-- [x] Catkinized
-- [x] Use wit.ai API
-- [x] Publish Outcome messages to /stt topic
+### TODO:
 - [ ] Subscribe to an audio stream topic and analyze 
 
 wit_ros
@@ -12,23 +9,24 @@ Wrapper for the wit.ai natural language API
 Installation
 ------------
 
-	$ git clone https://github.com/LoyVanBeek/wit_ros.git
-	$ cd wit_ros
-	$ cmake .
-	$ rosmake
+        $ cd catkin_ws/src
+        $ git clone https://github.com/LoyVanBeek/wit_ros.git
+        $ cd catkin_ws
+        $ catkin_make
 
 Be sure to create a file api.yaml in a param directory, like this:
 
-        $ cd param
+        $ roscd wit_ros/param
         $ vim api.yaml #Use any editor to edit the API key
           api_key: V.....Z #Get your API key/access token from https://console.wit.ai/#/settings
   
 After rosmake-ing this package, you can run it with 
-  roslaunch wit_ros start.launch
+
+       $ roslaunch wit_ros start.launch
 
 Then, run 
 
-	$ rosservice call /wit/interpret "hi there"
+        $ rosservice call /wit/interpret "hi there"
 
 This results in:
 
@@ -38,8 +36,3 @@ This results in:
   		confidence: 0.319000005722
   		intent: hello
   		entities: []
-
-
-TODO
-----
-- Catkinize this package. I've never worked with catkin before, so I stuck with rosbuild for now. 
