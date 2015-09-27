@@ -36,3 +36,9 @@ This results in:
   		confidence: 0.319000005722
   		intent: hello
   		entities: []
+
+Or, run 
+
+        $ rosservice call /wit/listen_interpret
+
+And just say your command!
