@@ -4,7 +4,7 @@
 wit_ros
 =======
 
-Wrapper for the wit.ai natural language API
+Wrapper for the [wit.ai](http://www.wit.ai) natural language API
 
 Installation
 ------------
