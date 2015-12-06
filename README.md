@@ -9,6 +9,7 @@ Wrapper for the [wit.ai](http://www.wit.ai) natural language API
 Installation
 ------------
 
+        $ sudo pip install wit
         $ cd catkin_ws/src
         $ git clone https://github.com/LoyVanBeek/wit_ros.git
         $ cd catkin_ws
