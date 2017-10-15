@@ -21,5 +21,6 @@
 
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>rospy</exec_depend>
+  <exec_depend>python-requests</exec_depend>
 
 </package>
