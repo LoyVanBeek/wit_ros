@@ -54,10 +54,12 @@ class WitRos(object):
     def interpret(self, rosrequest):
         sentence = rosrequest.sentence
         rospy.logdebug("Interpreting {0}".format(sentence))
-        response = json.loads(self.wit.message(sentence))
-        rospy.logdebug("Response: {0}".format(response))
+        wit_response = self.wit.message(sentence)
+        rospy.logdebug("WitResponse: {0}".format(wit_response))
+        #response = json.loads(wit_response)
+        #rospy.logdebug("Response: {0}".format(response))
 
-        return self.parse_response(response, InterpretResponse)
+        return self.parse_response(wit_response, InterpretResponse)
 
     # TODO: wit.voice_query_auto used to take care of oudio recording, now it needs an audio file or encoded audio byte
     # def listen_and_interpret(self, rosrequest):
