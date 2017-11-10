@@ -7,73 +7,79 @@ APIKEY = None
 import rospy
 import requests
 import json
-import wit
+from wit import Wit
 
 from wit_ros.srv import Interpret, InterpretResponse, ListenAndInterpret, ListenAndInterpretResponse
 from wit_ros.msg import Outcome, Entity
 
-def parse_response(response, klass):
-    rospy.logdebug("Data: {0}".format(json.dumps(response, indent=4, separators=(',', ': '))))
-    ros_entities = []
+class WitRos(object):
+    def __init__(self, api_key):
+        self.wit = Wit(api_key)
+        self.pub = rospy.Publisher('stt', Outcome, queue_size=1)
 
-    entities = response["outcomes"][0]["entities"]
+    def start(self):
+        rospy.Service('wit/interpret', Interpret, self.interpret)
+        # rospy.Service('wit/listen_interpret', ListenAndInterpret, self.listen_and_interpret)
 
-    for entity_name, entity_properties in entities.iteritems():
-        entity_properties = entity_properties[0]
-        entity = Entity(name=str(entity_name))
-        if 'type' in entity_properties:
-            entity.type = str(entity_properties["type"])
-        if 'value' in entity_properties:
-            entity.value = str(entity_properties["value"])
-        if 'unit' in entity_properties:
-            entity.unit = str(entity_properties["unit"])
-        if 'suggested' in entity_properties:
-            entity.suggested = str(entity_properties["suggested"])
-        ros_entities += [entity]
+    def parse_response(self, response, klass):
+        rospy.logdebug("Data: {0}".format(json.dumps(response, indent=4, separators=(',', ': '))))
+        ros_entities = []
 
-    outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
-                                entities    = ros_entities,
-                                intent      = str(response["outcomes"][0]["intent"]))
+        entities = response["outcomes"][0]["entities"]
 
-    response = klass(   msg_body    = str(response),
-                                    msg_id      = str(response["msg_id"]),
-                                    outcome     = outcome)
-    pub.publish(outcome)
+        for entity_name, entity_properties in entities.iteritems():
+            entity_properties = entity_properties[0]
+            entity = Entity(name=str(entity_name))
+            if 'type' in entity_properties:
+                entity.type = str(entity_properties["type"])
+            if 'value' in entity_properties:
+                entity.value = str(entity_properties["value"])
+            if 'unit' in entity_properties:
+                entity.unit = str(entity_properties["unit"])
+            if 'suggested' in entity_properties:
+                entity.suggested = str(entity_properties["suggested"])
+            ros_entities += [entity]
 
-    return response
+        outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
+                                    entities    = ros_entities,
+                                    intent      = str(response["outcomes"][0]["intent"]))
 
-def interpret(rosrequest):
-    sentence = rosrequest.sentence
-    rospy.logdebug("Interpreting {0}".format(sentence))
-    response = json.loads(wit.text_query(sentence, APIKEY))
-    rospy.logdebug("Response: {0}".format(response))
+        response = klass(   msg_body    = str(response),
+                                        msg_id      = str(response["msg_id"]),
+                                        outcome     = outcome)
+        self.pub.publish(outcome)
 
-    return parse_response(response, InterpretResponse)
+        return response
 
-def listen_and_interpret(rosrequest):
-    rospy.logdebug("About to record audio")
-    response = json.loads(wit.voice_query_auto(APIKEY))
-    rospy.logdebug("Response: {0}".format(response))
-    if not response:
-        return None
+    def interpret(self, rosrequest):
+        sentence = rosrequest.sentence
+        rospy.logdebug("Interpreting {0}".format(sentence))
+        wit_response = self.wit.message(sentence)
+        rospy.logdebug("WitResponse: {0}".format(wit_response))
+        #response = json.loads(wit_response)
+        #rospy.logdebug("Response: {0}".format(response))
 
-    return parse_response(response, ListenAndInterpretResponse)
+        return self.parse_response(wit_response, InterpretResponse)
 
-def shutdown():
-  wit.close()
+    # TODO: wit.voice_query_auto used to take care of oudio recording, now it needs an audio file or encoded audio byte
+    # def listen_and_interpret(self, rosrequest):
+    #     rospy.logdebug("About to record audio")
+    #     response = json.loads(self.wit.voice_query_auto(APIKEY))
+    #     rospy.logdebug("Response: {0}".format(response))
+    #     if not response:
+    #         return None
+    #
+    #     return self.parse_response(response, ListenAndInterpretResponse)
 
 if __name__ == "__main__":
     rospy.init_node("wit_ros", log_level=rospy.INFO)
-    rospy.on_shutdown(shutdown)
-    pub = rospy.Publisher('stt', Outcome, queue_size=1)
-
-    wit.init()
 
     if rospy.has_param('~api_key'):
         APIKEY = rospy.get_param("~api_key")
 
-        rospy.Service('wit/interpret', Interpret, interpret)
-        rospy.Service('wit/listen_interpret', ListenAndInterpret, listen_and_interpret)
+        wr = WitRos(APIKEY)
+
+        wr.start()
 
         rospy.spin()
 
