@@ -119,4 +119,4 @@ script:
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
   - roslaunch wit_ros start.launch &
-  - rosservice call /wit/interpret "sentence: 'bring me a beer'"
+  - rosservice call /wit/interpret "sentence':' 'bring me a beer'"
