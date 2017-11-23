@@ -119,4 +119,5 @@ script:
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
   - roslaunch wit_ros start.launch &
+  - sleep 5  # Wait for the node to be started
   - rosservice call /wit/interpret "sentence':' 'bring me a beer'"
