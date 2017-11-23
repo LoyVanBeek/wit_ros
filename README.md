@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/LoyVanBeek/wit_ros.svg?branch=master)](https://travis-ci.org/LoyVanBeek/wit_ros)
+
 ### TODO:
 - [ ] Subscribe to an audio stream topic and analyze
 
