@@ -28,7 +28,11 @@ class WitRos(object):
         if "WARNING" in response:
             rospy.logwarn("Response contains a warning: {warn}".format(warn=response["WARNING"]))
 
-        entities = response["entities"]
+        entities = []
+        if "entities" in response:
+            entities = response["entities"]
+        elif "outcomes" in response:
+            entities = response["outcomes"][0]["entities"]
 
         for entity_name, entity_properties in entities.iteritems():
             entity_properties = entity_properties[0]
