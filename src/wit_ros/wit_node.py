@@ -25,6 +25,9 @@ class WitRos(object):
         rospy.logdebug("Data: '{0}'".format(json.dumps(response, indent=4, separators=(',', ': '))))
         ros_entities = []
 
+        if "WARNING" in response:
+            rospy.logwarn("Response contains a warning: {warn}".format(warn=response["WARNING"]))
+
         entities = response["entities"]
 
         for entity_name, entity_properties in entities.iteritems():
