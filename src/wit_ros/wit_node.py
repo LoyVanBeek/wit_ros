@@ -29,6 +29,8 @@ class WitRos(object):
 
         for entity_name, entity_properties in entities.iteritems():
             entity_properties = entity_properties[0]
+            rospy.logdebug("Entity '{name}' has properties{prop}".format(name=entity_name, prop=entity_properties))
+
             entity = Entity(name=str(entity_name))
             if 'type' in entity_properties:
                 entity.type = str(entity_properties["type"])
@@ -38,6 +40,7 @@ class WitRos(object):
                 entity.unit = str(entity_properties["unit"])
             if 'suggested' in entity_properties:
                 entity.suggested = str(entity_properties["suggested"])
+            rospy.logdebug("Adding {ent}".format(ent=entity))
             ros_entities += [entity]
 
         outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
@@ -53,7 +56,7 @@ class WitRos(object):
 
     def interpret(self, rosrequest):
         sentence = rosrequest.sentence
-        rospy.logdebug("Interpreting {0}".format(sentence))
+        rospy.logdebug("Interpreting '{0}'".format(sentence))
         wit_response = self.wit.message(sentence)
         rospy.logdebug("WitResponse: {0}".format(wit_response))
         #response = json.loads(wit_response)
