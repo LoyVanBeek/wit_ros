@@ -22,7 +22,7 @@ class WitRos(object):
         # rospy.Service('wit/listen_interpret', ListenAndInterpret, self.listen_and_interpret)
 
     def parse_response(self, response, klass):
-        rospy.logdebug("Data: {0}".format(json.dumps(response, indent=4, separators=(',', ': '))))
+        rospy.logdebug("Data: '{0}'".format(json.dumps(response, indent=4, separators=(',', ': '))))
         ros_entities = []
 
         entities = response["outcomes"][0]["entities"]
