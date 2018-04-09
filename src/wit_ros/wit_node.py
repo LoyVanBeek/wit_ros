@@ -43,13 +43,13 @@ class WitRos(object):
             rospy.logdebug("Adding {ent}".format(ent=entity))
             ros_entities += [entity]
 
-        outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
-                                    entities    = ros_entities,
-                                    intent      = str(response["outcomes"][0]["intent"]))
+        outcome = Outcome(entities = ros_entities,
+                          intent   = str(response.get("intent", "")),
+                          text     = str(response["_text"]))
 
         response = klass(   msg_body    = str(response),
-                                        msg_id      = str(response["msg_id"]),
-                                        outcome     = outcome)
+                            msg_id      = str(response["msg_id"]),
+                            outcome     = outcome)
         self.pub.publish(outcome)
 
         return response
