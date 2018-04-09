@@ -25,7 +25,7 @@ class WitRos(object):
         rospy.logdebug("Data: '{0}'".format(json.dumps(response, indent=4, separators=(',', ': '))))
         ros_entities = []
 
-        entities = response["outcomes"][0]["entities"]
+        entities = response["entities"]
 
         for entity_name, entity_properties in entities.iteritems():
             entity_properties = entity_properties[0]
