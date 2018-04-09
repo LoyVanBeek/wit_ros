@@ -8,3 +8,4 @@ string type
 string value
 string unit
 string suggested
+float32 confidence

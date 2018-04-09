@@ -40,6 +40,8 @@ class WitRos(object):
                 entity.unit = str(entity_properties["unit"])
             if 'suggested' in entity_properties:
                 entity.suggested = str(entity_properties["suggested"])
+            if 'confidence' in entity_properties:
+                entity.confidence = float(entity_properties["confidence"])
             rospy.logdebug("Adding {ent}".format(ent=entity))
             ros_entities += [entity]
 
