@@ -22,13 +22,25 @@ class WitRos(object):
         # rospy.Service('wit/listen_interpret', ListenAndInterpret, self.listen_and_interpret)
 
     def parse_response(self, response, klass):
-        rospy.logdebug("Data: {0}".format(json.dumps(response, indent=4, separators=(',', ': '))))
+        rospy.logdebug("Data: '{0}'".format(json.dumps(response, indent=4, separators=(',', ': '))))
         ros_entities = []
 
-        entities = response["outcomes"][0]["entities"]
+        if "WARNING" in response:
+            rospy.logwarn("Response contains a warning: {warn}".format(warn=response["WARNING"]))
+
+        outcome = None
+        entities = []
+
+        if "entities" in response:
+            entities = response["entities"]
+        elif "outcomes" in response:
+            outcome = response["outcomes"][0]
+            entities = outcome["entities"]
 
         for entity_name, entity_properties in entities.iteritems():
             entity_properties = entity_properties[0]
+            rospy.logdebug("Entity '{name}' has properties{prop}".format(name=entity_name, prop=entity_properties))
+
             entity = Entity(name=str(entity_name))
             if 'type' in entity_properties:
                 entity.type = str(entity_properties["type"])
@@ -38,22 +50,25 @@ class WitRos(object):
                 entity.unit = str(entity_properties["unit"])
             if 'suggested' in entity_properties:
                 entity.suggested = str(entity_properties["suggested"])
+            if 'confidence' in entity_properties:
+                entity.confidence = float(entity_properties["confidence"])
+            rospy.logdebug("Adding {ent}".format(ent=entity))
             ros_entities += [entity]
 
-        outcome = Outcome(          confidence  = float(response["outcomes"][0]["confidence"]),
-                                    entities    = ros_entities,
-                                    intent      = str(response["outcomes"][0]["intent"]))
+        outcome = Outcome(entities = ros_entities,
+                          intent   = str(outcome["intent"]) if outcome else None,
+                          text     = str(response["_text"]))
 
         response = klass(   msg_body    = str(response),
-                                        msg_id      = str(response["msg_id"]),
-                                        outcome     = outcome)
+                            msg_id      = str(response["msg_id"]),
+                            outcome     = outcome)
         self.pub.publish(outcome)
 
         return response
 
     def interpret(self, rosrequest):
         sentence = rosrequest.sentence
-        rospy.logdebug("Interpreting {0}".format(sentence))
+        rospy.logdebug("Interpreting '{0}'".format(sentence))
         wit_response = self.wit.message(sentence)
         rospy.logdebug("WitResponse: {0}".format(wit_response))
         #response = json.loads(wit_response)
